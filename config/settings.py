@@ -2,7 +2,10 @@ import os
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(__file__))
 
-TELEGRAM_TOKEN = 'TOKEN'
+TELEGRAM_TOKEN = os.environ.get(
+    key='TELEGRAM_BOT_TOKEN',
+    default='TOKEN'
+)
 JOB_INTERVAL = 60  # seconds
 
 
