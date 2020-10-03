@@ -1,5 +1,5 @@
 from telegram.ext import Updater, CommandHandler
-from config import TELEGRAM_TOKEN, TRANSPORTERS_CONFIG, JOB_INTERVAL
+from config import TELEGRAM_TOKEN, APP_PORT, APP_HOST, TRANSPORTERS_CONFIG, JOB_INTERVAL
 from transporter.transporter9911 import Transporter9911
 from utils import build_request
 import uuid
@@ -61,7 +61,10 @@ def main():
     dispatcher.add_handler(request_handler)
     dispatcher.add_handler(stop_handler)
 
-    updater.start_polling()
+    updater.start_webhook(listen="0.0.0.0", port=int(APP_PORT), url_path=TELEGRAM_TOKEN)
+    updater.bot.setWebhook(f'{APP_HOST}{TELEGRAM_TOKEN}')
+
+    updater.idle()
 
 
 if __name__ == '__main__':
