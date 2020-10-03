@@ -1,12 +1,13 @@
 from telegram.ext import Updater, CommandHandler
 from config import TELEGRAM_TOKEN, APP_PORT, APP_HOST, TRANSPORTERS_CONFIG, JOB_INTERVAL
-from transporter.transporter9911 import Transporter9911
+from transporter import Transporter9911, Transporter618
 from utils import build_request
 import uuid
 import logging
 
 transporters = {
-    '9911.by': Transporter9911(TRANSPORTERS_CONFIG['9911.by'])
+    '9911.by': Transporter9911(TRANSPORTERS_CONFIG['9911.by']),
+    '618.by': Transporter618(TRANSPORTERS_CONFIG['618.by'])
 }
 
 logger = logging.getLogger(__name__)

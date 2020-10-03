@@ -15,19 +15,6 @@ TELEGRAM_TOKEN = os.environ.get(
 JOB_INTERVAL = 60  # seconds
 
 
-TRANSPORTERS_CONFIG = {
-    '9911.by': {
-        'site': '9911.by',
-        'url': "https://route.by/local/components/route/user.order/templates/.default/ajax.php",
-        'locations': {
-            'Rechitsa': 152,
-            'Gomel': 20
-        },
-        'date_format': '%d.%m.%Y'
-    }
-}
-
-
 LOCAL_SETTINGS = os.path.join(PROJECT_ROOT, "local_settings.py")
 if os.path.exists(LOCAL_SETTINGS):
     with open(LOCAL_SETTINGS) as f:
