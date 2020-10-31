@@ -12,6 +12,12 @@ TELEGRAM_TOKEN = os.environ.get(
     key='TELEGRAM_BOT_TOKEN',
     default='TOKEN'
 )
+
+DATABASE_URL = os.environ.get(
+    key='DATABASE_URL',
+    default='DB_URL'
+)
+
 JOB_INTERVAL = 60  # seconds
 
 
