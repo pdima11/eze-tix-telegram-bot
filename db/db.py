@@ -3,6 +3,19 @@ import psycopg2.extras
 from config import DATABASE_URL
 
 
+class UserSQL(object):
+    save = '''
+        INSERT INTO users (user_id, username, first_name, last_name, is_bot, language_code, last_visit) 
+        VALUES (%(user_id)s, %(username)s, %(first_name)s, %(last_name)s, %(is_bot)s, %(language_code)s, %(visit_datetime)s)
+        ON CONFLICT (user_id) DO UPDATE 
+        SET username = excluded.username, 
+            first_name = excluded.first_name,
+            last_name = excluded.last_name,
+            language_code = excluded.language_code,
+            last_visit = excluded.last_visit;
+    '''
+
+
 class DB(object):
     _conn = None
 

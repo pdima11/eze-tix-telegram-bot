@@ -2,6 +2,8 @@ from telegram.ext import Updater, CommandHandler
 from config import TELEGRAM_TOKEN, APP_PORT, APP_HOST, TRANSPORTERS_CONFIG, JOB_INTERVAL
 from transporter import Transporter9911, Transporter618
 from utils import build_request
+from models import User
+from db import DB, UserSQL
 import uuid
 import logging
 
@@ -29,8 +31,9 @@ def process_request(context):
 
 
 def request_trip(update, context):
-    user = update.message.from_user["username"]
-    logger.info(f'Starting process find ticket request from {user} user: {context.args}')
+    user = User.from_dict(update.message.from_user)
+    DB.execute(UserSQL.save, user.asdict())
+    logger.info(f'Starting process find ticket request from {user.username} user: {context.args}')
 
     request_id = str(uuid.uuid4())[:8]
     request = build_request(request_id, context.args)
@@ -41,9 +44,9 @@ def request_trip(update, context):
     }
 
     message = f'Your request *{request_id}* is processing...'
-    context.bot.send_message(update.effective_chat.id, text=message, parse_mode='Markdown')
+    context.bot.send_message(user.id, text=message, parse_mode='Markdown')
     context.job_queue.run_repeating(process_request, interval=JOB_INTERVAL, first=0, context=data, name=request_id)
-    logger.info(f'Request {request_id} from {user} user was successfully added to job queue')
+    logger.info(f'Request {request_id} from {user.username} user was successfully added to job queue')
 
 
 def remove_request(update, context):
