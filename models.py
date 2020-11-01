@@ -65,8 +65,8 @@ class User(object):
 
 class RequestStatus(Enum):
     created = 'CREATED'
-    in_progress = 'IN_PROGRESS'
-    done = 'DONE'
+    in_progress = 'IN PROGRESS'
+    closed = 'CLOSED'
 
 
 class Request(object):

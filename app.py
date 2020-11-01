@@ -2,7 +2,7 @@ from telegram.ext import Updater, CommandHandler
 from config import TELEGRAM_TOKEN, APP_PORT, APP_HOST, TRANSPORTERS_CONFIG, JOB_INTERVAL
 from transporter import Transporter9911, Transporter618
 from utils import build_request
-from models import User
+from models import User, RequestStatus
 from db import DB, UserSQL, RequestSQL
 import logging
 
@@ -39,6 +39,8 @@ def request_trip(update, context):
     message = f'Your request *{request.id}* is processing...'
     context.bot.send_message(user.id, text=message, parse_mode='Markdown')
     context.job_queue.run_repeating(process_request, interval=JOB_INTERVAL, first=0, context=request, name=request.id)
+
+    DB.execute(RequestSQL.update_status_by_id, [RequestStatus.in_progress.value, request.id])
     logger.info(f'Request {request.id} from {user.username} user was successfully added to job queue')
 
 
@@ -46,11 +48,12 @@ def remove_request(update, context):
     request_id = context.args[0]
     logger.info(f'Starting process of removing {request_id} request id by {update.message.from_user["username"]} user')
 
-    jobs = context.job_queue.get_jobs_by_name(request_id)
-    message = f'Your request *{request_id}* was successfully removed'
+    jobs = context.job_queue.get_jobs_by_name(int(request_id))
+    message = f'Your request *{request_id}* was successfully closed'
     if jobs:
-        for job in context.job_queue.get_jobs_by_name(request_id):
+        for job in jobs:
             job.schedule_removal()
+            DB.execute(RequestSQL.update_status_by_id, [RequestStatus.closed.value, request_id])
     else:
         message = f'Unfortunately request *{request_id}* doesn\'t exist'
     context.bot.send_message(update.effective_chat.id, text=message, parse_mode='Markdown')

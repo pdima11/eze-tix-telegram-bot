@@ -23,6 +23,12 @@ class RequestSQL(object):
         RETURNING request_id
     '''
 
+    update_status_by_id = '''
+        UPDATE requests
+        SET status = %s
+        WHERE request_id = %s
+    '''
+
 
 class DB(object):
     _conn = None
