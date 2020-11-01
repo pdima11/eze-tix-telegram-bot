@@ -6,7 +6,7 @@ DROP SCHEMA IF EXISTS ezetixbot;
 
 CREATE SCHEMA ezetixbot;
 
-CREATE TYPE REQUEST_STATUS AS ENUM ('IN PROGRESS', 'DONE');
+CREATE TYPE REQUEST_STATUS AS ENUM ('CREATED', 'IN PROGRESS', 'CLOSED');
 
 CREATE TABLE ezetixbot.users (
     user_id INTEGER PRIMARY KEY,
@@ -24,9 +24,10 @@ CREATE TABLE ezetixbot.requests (
 	transporter VARCHAR(20) NOT NULL,
 	departure VARCHAR(20) NOT NULL,
 	arrival VARCHAR(20) NOT NULL,
+	required_date DATE NOT NULL,
 	from_time VARCHAR(5) NOT NULL,
 	to_time VARCHAR(5) NOT NULL,
 	status REQUEST_STATUS NOT NULL,
 	created_at TIMESTAMP without time zone DEFAULT NOW(),
-	closed_at TIMESTAMP without time zone DEFAULT NOW()
+	closed_at TIMESTAMP without time zone
 )
