@@ -62,7 +62,7 @@ def remove_request(update, context):
     if jobs:
         for job in jobs:
             job.schedule_removal()
-            DB.execute(RequestSQL.update_status_by_id, [RequestStatus.closed.value, request_id])
+            DB.execute(RequestSQL.close_by_id, [request_id])
     else:
         message = f'Unfortunately request *{request_id}* doesn\'t exist'
     context.bot.send_message(update.effective_chat.id, text=message, parse_mode='Markdown')

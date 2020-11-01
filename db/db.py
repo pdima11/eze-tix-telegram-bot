@@ -24,6 +24,13 @@ class RequestSQL(object):
         RETURNING request_id
     '''
 
+    close_by_id = '''
+        UPDATE requests
+        SET status = '{}',
+            closed_at = NOW()
+        WHERE request_id = %s
+    '''.format(RequestStatus.closed.value)
+
     update_status_by_id = '''
         UPDATE requests
         SET status = %s
