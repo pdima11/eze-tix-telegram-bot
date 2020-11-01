@@ -1,6 +1,7 @@
 import psycopg2
 import psycopg2.extras
 from config import DATABASE_URL
+from models import RequestStatus
 
 
 class UserSQL(object):
@@ -28,6 +29,15 @@ class RequestSQL(object):
         SET status = %s
         WHERE request_id = %s
     '''
+
+    get_active_requests = '''
+        SELECT *
+        FROM requests
+        WHERE status IN ('{}', '{}')
+    '''.format(
+        RequestStatus.in_progress.value,
+        RequestStatus.created.value
+    )
 
 
 class DB(object):

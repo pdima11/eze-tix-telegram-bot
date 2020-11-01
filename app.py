@@ -2,7 +2,7 @@ from telegram.ext import Updater, CommandHandler
 from config import TELEGRAM_TOKEN, APP_PORT, APP_HOST, TRANSPORTERS_CONFIG, JOB_INTERVAL
 from transporter import Transporter9911, Transporter618
 from utils import build_request
-from models import User, RequestStatus
+from models import User, RequestStatus, Request
 from db import DB, UserSQL, RequestSQL
 import logging
 
@@ -12,6 +12,15 @@ transporters = {
 }
 
 logger = logging.getLogger(__name__)
+
+
+def init_job_queue(job_queue):
+    requests = DB.execute(RequestSQL.get_active_requests)
+    logger.info(f'Add next requests to job queue during initialization: {[r["request_id"] for r in requests]}')
+
+    for data in requests:
+        request = Request.from_dict(data)
+        job_queue.run_repeating(process_request, interval=JOB_INTERVAL, first=0, context=request, name=request.id)
 
 
 def process_request(context):
@@ -64,6 +73,8 @@ def main():
                         level=logging.INFO)
     updater = Updater(token=TELEGRAM_TOKEN, use_context=True)
     dispatcher = updater.dispatcher
+
+    init_job_queue(dispatcher.job_queue)
 
     request_handler = CommandHandler('request', request_trip)
     stop_handler = CommandHandler('stop', remove_request)

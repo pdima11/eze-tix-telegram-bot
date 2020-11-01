@@ -94,6 +94,24 @@ class Request(object):
         self.created_at = created_at
         self.closed_at = closed_at
 
+    @classmethod
+    def from_dict(cls, data):
+        from utils import str_to_datetime
+        required_date = datetime.combine(data['required_date'], datetime.min.time())
+        return cls(
+            request_id=data['request_id'],
+            user_id=data['user_id'],
+            transporter=data['transporter'],
+            departure=data['departure'],
+            arrival=data['arrival'],
+            required_date=required_date,
+            from_time=str_to_datetime(required_date, data['from_time']),
+            to_time=str_to_datetime(required_date, data['to_time']),
+            status=data['status'],
+            created_at=data['created_at'],
+            closed_at=data['closed_at']
+        )
+
     def asdict(self):
         return {
             'request_id': self.id,
@@ -102,8 +120,8 @@ class Request(object):
             'departure': self.departure,
             'arrival': self.arrival,
             'required_date': str(self.required_date),
-            'from_time': str(self.from_time.time()),
-            'to_time': str(self.to_time.time()),
+            'from_time': self.from_time.strftime("%H:%M"),
+            'to_time': self.to_time.strftime("%H:%M"),
             'status': self.status.value,
             'created_at': str(self.created_at),
             'closed_at': str(self.closed_at),
