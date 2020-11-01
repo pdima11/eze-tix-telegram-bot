@@ -12,7 +12,7 @@ class Transporter9911(object):
     def __get_free_seats_by_time(self, seats, times, request):
         result = []
         for seat, time in zip(seats, times):
-            seat_datetime = str_to_datetime(request.date, time.text)
+            seat_datetime = str_to_datetime(request.required_date, time.text)
             seats_count = int(seat.text)
             if seats_count > 0 and request.from_time <= seat_datetime <= request.to_time:
                 result.append(TicketResponse(seat_datetime, seats_count))
@@ -24,7 +24,7 @@ class Transporter9911(object):
             'type': 'load_list_order',
             'select_in': self.config['locations'][request.departure],
             'select_out': self.config['locations'][request.arrival],
-            'date': request.date.strftime(self.config['date_format']),
+            'date': request.required_date.strftime(self.config['date_format']),
             'strGET': ''
         }
 

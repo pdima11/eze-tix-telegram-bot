@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import Enum
 
 
 class TicketRequest(object):
@@ -59,4 +60,51 @@ class User(object):
             'is_bot': self.is_bot,
             'language_code': self.language_code,
             'visit_datetime': str(self.visit_datetime)
+        }
+
+
+class RequestStatus(Enum):
+    created = 'CREATED'
+    in_progress = 'IN_PROGRESS'
+    done = 'DONE'
+
+
+class Request(object):
+    def __init__(self,
+                 request_id,
+                 user_id,
+                 transporter,
+                 departure,
+                 arrival,
+                 required_date,
+                 from_time,
+                 to_time,
+                 status,
+                 created_at,
+                 closed_at):
+        self.id = request_id
+        self.user_id = user_id
+        self.transporter = transporter
+        self.departure = departure
+        self.arrival = arrival
+        self.required_date = required_date
+        self.from_time = from_time
+        self.to_time = to_time
+        self.status = status
+        self.created_at = created_at
+        self.closed_at = closed_at
+
+    def asdict(self):
+        return {
+            'request_id': self.id,
+            'user_id': self.user_id,
+            'transporter': self.transporter,
+            'departure': self.departure,
+            'arrival': self.arrival,
+            'required_date': str(self.required_date),
+            'from_time': str(self.from_time.time()),
+            'to_time': str(self.to_time.time()),
+            'status': self.status.value,
+            'created_at': str(self.created_at),
+            'closed_at': str(self.closed_at),
         }

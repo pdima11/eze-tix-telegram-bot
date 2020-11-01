@@ -3,8 +3,7 @@ from config import TELEGRAM_TOKEN, APP_PORT, APP_HOST, TRANSPORTERS_CONFIG, JOB_
 from transporter import Transporter9911, Transporter618
 from utils import build_request
 from models import User
-from db import DB, UserSQL
-import uuid
+from db import DB, UserSQL, RequestSQL
 import logging
 
 transporters = {
@@ -16,18 +15,17 @@ logger = logging.getLogger(__name__)
 
 
 def process_request(context):
-    data = context.job.context
+    request = context.job.context
 
-    request = data['request']
     transporter_site = TRANSPORTERS_CONFIG[request.transporter]['site']
     tickets = transporters[request.transporter].find_ticket(request)
 
     message = f'Following tickets are available for your request *{request.id}*. To order them go to {transporter_site}:'
 
     if tickets:
-        context.bot.send_message(chat_id=data['chat_id'], text=message, parse_mode='Markdown')
+        context.bot.send_message(chat_id=request.user_id, text=message, parse_mode='Markdown')
         for ticket in tickets:
-            context.bot.send_message(chat_id=data['chat_id'], text=f'{ticket}')
+            context.bot.send_message(chat_id=request.user_id, text=f'{ticket}')
 
 
 def request_trip(update, context):
@@ -35,18 +33,13 @@ def request_trip(update, context):
     DB.execute(UserSQL.save, user.asdict())
     logger.info(f'Starting process find ticket request from {user.username} user: {context.args}')
 
-    request_id = str(uuid.uuid4())[:8]
-    request = build_request(request_id, context.args)
+    request = build_request(user.id, context.args)
+    request.id = DB.execute(RequestSQL.create, request.asdict())[0][0]
 
-    data = {
-        'request': request,
-        'chat_id': update.message.chat_id
-    }
-
-    message = f'Your request *{request_id}* is processing...'
+    message = f'Your request *{request.id}* is processing...'
     context.bot.send_message(user.id, text=message, parse_mode='Markdown')
-    context.job_queue.run_repeating(process_request, interval=JOB_INTERVAL, first=0, context=data, name=request_id)
-    logger.info(f'Request {request_id} from {user.username} user was successfully added to job queue')
+    context.job_queue.run_repeating(process_request, interval=JOB_INTERVAL, first=0, context=request, name=request.id)
+    logger.info(f'Request {request.id} from {user.username} user was successfully added to job queue')
 
 
 def remove_request(update, context):

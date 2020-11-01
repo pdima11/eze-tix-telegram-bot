@@ -1,1 +1,1 @@
-from db.db import DB, UserSQL
+from db.db import DB, UserSQL, RequestSQL

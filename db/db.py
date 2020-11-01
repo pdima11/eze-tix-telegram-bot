@@ -16,6 +16,14 @@ class UserSQL(object):
     '''
 
 
+class RequestSQL(object):
+    create = '''
+        INSERT INTO requests (user_id, transporter, departure, arrival, required_date, from_time, to_time, status, created_at) 
+        VALUES (%(user_id)s, %(transporter)s, %(departure)s, %(arrival)s, %(required_date)s, %(from_time)s, %(to_time)s, %(status)s, %(created_at)s)
+        RETURNING request_id
+    '''
+
+
 class DB(object):
     _conn = None
 
