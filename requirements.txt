@@ -1,4 +1,4 @@
 python-telegram-bot==12.4.2
-requests==2.24.0
+requests==2.31.0
 beautifulsoup4==4.9.2
 psycopg2==2.8.5
